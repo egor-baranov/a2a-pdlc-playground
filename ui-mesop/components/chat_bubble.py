@@ -61,17 +61,17 @@ def chat_box(
                     style=me.Style(
                         font_family="Google Sans",
                         box_shadow=(
-                            "0 4px 6px rgba(0, 0, 0, 0.1), "
-                            "0 1px 3px rgba(0, 0, 0, 0.08)"
+                            "" if role == "user" else
+                            "0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08)"
                         ),
-                        padding=me.Padding(top=12, left=16, right=16, bottom=12),
-                        margin=me.Margin(top=6, left=0, right=0, bottom=6),
-                        background=(
-                            "#DCFCE7" if role == "user" else "#F1F5F9"  # soft green / light slate
-                        ),
-                        border_radius=18,
+                        padding=me.Padding(top=1, left=15, right=15, bottom=1),
+                        margin=me.Margin(top=5, left=0, right=0, bottom=5),
+                        background="#F1F5F9" if role == "user" else "#FFFFFF",
+                        border_radius=15,
+                        width="100%" if role != "user" else None  # LLM responses full width
                     ),
                 )
+
     if progress_bar:
       with me.box(
         style=me.Style(

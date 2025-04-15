@@ -1,52 +1,36 @@
-## Demo Web App
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-This demo application showcases agents talking to other agents over A2A. 
+## Getting Started
 
-![image](/images/a2a_demo_arch.png)
+First, run the development server:
 
-* The frontend is a [mesop](https://github.com/mesop-dev/mesop) web application that renders conversations as content between the end user and the "Host Agent". This app can render text content, thought bubbles, web forms (requests for input from agents), and images. More content types coming soon 
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
 
-* The [Host Agent](/agents/hosts/multiagent/host_agent.py) is a Google ADK agent which orchestrates user requests to Remote Agents. 
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-* Each [Remote Agent](/agents/hosts/multiagent/remote_agent_connection.py) is an A2AClient running inside a Google ADK agent. Each remote agent will retrieve the A2AServer's [AgentCard](https://google.github.io/A2A/#documentation?id=agent-card) and then proxy all requests using A2A. 
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-## Features
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-<need quick gif>
+## Learn More
 
-### Dynamically add agents
-Clicking on the robot icon in the web app lets you add new agents. Enter the address of the remote agent's AgentCard and the app will fetch the card and add the remote agent to the local set of known agents.  
+To learn more about Next.js, take a look at the following resources:
 
-### Speak with one or more agents
-Click on the chat button to start or continue an existing conversation. This conversation will go to the Host Agent which will then delegate the request to one or more remote agents. 
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-If the agent returns complex content - like an image or a web-form - the frontend will render this in the conversation view. The Remote Agent will take care of converting this content between A2A and the web apps native application representation.
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-### Explore A2A Tasks
-Click on the history to see the messages sent between the web app and all of the agents (Host agent and Remote agents). 
+## Deploy on Vercel
 
-Click on the task list to see all the A2A task updates from the remote agents
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-## Prerequisites
-
-- Python 3.12 or higher
-- UV
-- Agent servers speaking A2A ([use these samples](/agents/implementation/README.md))
-
-## Running the Examples
-
-1. Navigate to the demo ui directory:
-    ```bash
-    cd demo/ui
-    ```
-2. Create an environment file with your API key:
-
-   ```bash
-   echo "GOOGLE_API_KEY=your_api_key_here" > .env
-   ```
-
-3. Run the front end example:
-    ```bash
-    uv run main.py
-    ```
-Note: The application runs on port 12000 by default
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
