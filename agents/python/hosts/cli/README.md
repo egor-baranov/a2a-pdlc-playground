@@ -14,7 +14,7 @@ The client will use streaming if the server supports it.
 
 1. Navigate to the samples directory:
     ```bash
-    cd samples/python
+    cd agents/python
     ```
 2. Run the example client
     ```
