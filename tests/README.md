@@ -2,7 +2,7 @@
 
 1. Activate the virtual environment
     ```bash
-    source agents/python/.venv/bin/activate
+    source implementation/python/.venv/bin/activate
     ```
 2. Run the tests
     ```bash

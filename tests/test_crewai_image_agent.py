@@ -47,7 +47,7 @@ def mock_genai_client(mocker):
   mock_models.generate_content.return_value = mock_response
   mock_client_instance.models = mock_models
 
-  mock_genai_class = mocker.patch("agents.crewai.agent.genai.Client")
+  mock_genai_class = mocker.patch("implementation.crewai.agent.genai.Client")
   mock_genai_class.return_value = mock_client_instance
 
   return {
@@ -75,7 +75,7 @@ def mock_cache(mocker):
   mock_cache_instance.get.side_effect = mock_get
   mock_cache_instance.set.side_effect = mock_set
 
-  mock_cache_class = mocker.patch("agents.crewai.agent.InMemoryCache")
+  mock_cache_class = mocker.patch("implementation.crewai.agent.InMemoryCache")
   mock_cache_class.return_value = mock_cache_instance
 
   return {"instance": mock_cache_instance, "storage": cache_storage}
@@ -85,7 +85,7 @@ def mock_cache(mocker):
 def mock_pil_image(mocker):
   """Mocks PIL Image operations."""
   mock_image_instance = MagicMock(spec=Image.Image)
-  mock_image_open = mocker.patch("agents.crewai.agent.Image.open")
+  mock_image_open = mocker.patch("implementation.crewai.agent.Image.open")
   mock_image_open.return_value = mock_image_instance
   return {"open": mock_image_open, "instance": mock_image_instance}
 
@@ -93,10 +93,10 @@ def mock_pil_image(mocker):
 @pytest.fixture
 def image_agent_instance(mocker, mock_env_vars):
   """Provides a mocked instance of ImageGenerationAgent."""
-  mocker.patch("agents.crewai.agent.LLM")
-  mocker.patch("agents.crewai.agent.Agent")
-  mocker.patch("agents.crewai.agent.Task")
-  mock_crew = mocker.patch("agents.crewai.agent.Crew")
+  mocker.patch("implementation.crewai.agent.LLM")
+  mocker.patch("implementation.crewai.agent.Agent")
+  mocker.patch("implementation.crewai.agent.Task")
+  mock_crew = mocker.patch("implementation.crewai.agent.Crew")
   mock_crew_instance = MagicMock()
   mock_crew.return_value = mock_crew_instance
 
@@ -107,7 +107,7 @@ def image_agent_instance(mocker, mock_env_vars):
 
 def test_get_api_key(mocker):
   """Tests if get_api_key reads the correct environment variable."""
-  mock_loader = mocker.patch("agents.crewai.agent.load_dotenv")
+  mock_loader = mocker.patch("implementation.crewai.agent.load_dotenv")
   api_key = get_api_key()
   assert api_key == "test_api_key"
   mock_loader.assert_called_once()
@@ -117,7 +117,7 @@ def test_generate_image_tool_success_new_image(
     mocker, mock_genai_client, mock_cache
 ):
   """Tests the tool generating a new image successfully."""
-  mock_uuid = mocker.patch("agents.crewai.agent.uuid4")
+  mock_uuid = mocker.patch("implementation.crewai.agent.uuid4")
   test_uuid = UUID("12345678123456781234567812345678")
   mock_uuid.return_value = test_uuid
 
@@ -159,7 +159,7 @@ def test_generate_image_tool_success_with_ref_image(
     mocker, mock_genai_client, mock_cache, mock_pil_image
 ):
   """Tests the tool using a reference image from cache."""
-  mock_uuid = mocker.patch("agents.crewai.agent.uuid4")
+  mock_uuid = mocker.patch("implementation.crewai.agent.uuid4")
   test_uuid_new = UUID("abcdefabcdefabcdefabcdefabcdefab")
   mock_uuid.return_value = test_uuid_new
 
@@ -179,7 +179,7 @@ def test_generate_image_tool_success_with_ref_image(
   }
 
   mock_loader = mocker.patch(
-      "agents.crewai.agent.base64.b64decode",
+      "implementation.crewai.agent.base64.b64decode",
       return_value=b"previous_image_data",
   )
 
@@ -212,12 +212,12 @@ def test_generate_image_tool_empty_prompt(mocker):
 
 def test_image_generation_agent_init(mocker):
   """Tests the agent's constructor."""
-  mock_llm_class = mocker.patch("agents.crewai.agent.LLM")
-  mock_agent_class = mocker.patch("agents.crewai.agent.Agent")
-  mock_task_class = mocker.patch("agents.crewai.agent.Task")
-  mock_crew_class = mocker.patch("agents.crewai.agent.Crew")
+  mock_llm_class = mocker.patch("implementation.crewai.agent.LLM")
+  mock_agent_class = mocker.patch("implementation.crewai.agent.Agent")
+  mock_task_class = mocker.patch("implementation.crewai.agent.Task")
+  mock_crew_class = mocker.patch("implementation.crewai.agent.Crew")
   mocker.patch(
-      "agents.crewai.agent.get_api_key", return_value="fake_key_for_init"
+      "implementation.crewai.agent.get_api_key", return_value="fake_key_for_init"
   )
 
   agent = ImageGenerationAgent()
