@@ -149,13 +149,15 @@ def return_solution(task_details: dict[str, Any], code_info: dict[str, Any], tes
     return solution
 
 
-class QAAgent:
+class AgentBuilderTemplate:
     """An agent that handles reimbursement requests."""
 
     SUPPORTED_CONTENT_TYPES = ["text", "text/plain"]
 
-    def __init__(self):
-        self._agent = self._build_agent()
+    _agent: LlmAgent
+
+    def __init__(self, llm_agent: LlmAgent):
+        self._agent = llm_agent
         self._user_id = "remote_agent"
         self._runner = Runner(
             app_name=self._agent.name,
@@ -225,36 +227,3 @@ class QAAgent:
                     "is_task_complete": False,
                     "updates": "Processing the QA request...",
                 }
-
-    def _build_agent(self) -> LlmAgent:
-        """Builds the LLM agent for Quality Assurance (QA) tasks."""
-        return LlmAgent(
-            model="gemini-2.0-flash-001",
-            name="qa_agent",
-            description=(
-                "This agent assists with quality assurance tasks, including test case generation, test execution, "
-                "and delivering actionable feedback on software functionality and performance."
-            ),
-            instruction="""
-      You are an agent who assists with Quality Assurance (QA) for software developed within GitVerse.
-
-      When you receive a QA request, you should first gather all necessary information:
-        1. The functionality or feature that needs testing.
-        2. Detailed descriptions of user flows, critical code sections, or functional requirements.
-        3. Potential edge cases or error scenarios that should be verified.
-
-      If any required information is missing, ask for clarification to ensure complete test coverage.
-
-      Once you have all the necessary details, you should:
-        - Generate a draft test plan or set of test cases using the generate_tests() tool.
-        - Execute tests against the target functionality by calling run_tests().
-        - Provide feedback and recommendations by calling return_feedback() with the test results and observations.
-
-      In your response, include a summary of the QA process, the outcomes from the tests, and any identified issues or improvement suggestions.
-          """,
-            tools=[
-                generate_tests,
-                run_tests,
-                return_feedback,
-            ],
-        )

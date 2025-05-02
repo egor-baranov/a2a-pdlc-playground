@@ -1,4 +1,3 @@
-
 """A UI solution and host service to interact with the agent framework.
 run:
   uv main.py
@@ -26,21 +25,23 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 def on_load(e: me.LoadEvent):  # pylint: disable=unused-argument
     """On load event"""
     state = me.state(AppState)
     me.set_theme_mode(state.theme_mode)
     if "conversation_id" in me.query_params:
-      state.current_conversation_id = me.query_params["conversation_id"]
+        state.current_conversation_id = me.query_params["conversation_id"]
     else:
-      state.current_conversation_id = ""
+        state.current_conversation_id = ""
+
 
 # Policy to allow the lit custom element to load
-security_policy=me.SecurityPolicy(
+security_policy = me.SecurityPolicy(
     allowed_script_srcs=[
-      'https://cdn.jsdelivr.net',
+        'https://cdn.jsdelivr.net',
     ]
-  )
+)
 
 
 @me.page(
@@ -77,6 +78,7 @@ def chat_page():
     """Conversation Page."""
     conversation_page(me.state(AppState))
 
+
 @me.page(
     path="/event_list",
     title="Event List",
@@ -109,6 +111,7 @@ def task_page():
     """Task List Page."""
     task_list_page(me.state(AppState))
 
+
 # Setup the server global objects
 app = FastAPI()
 router = APIRouter()
@@ -122,12 +125,13 @@ app.mount(
     ),
 )
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
     if not os.getenv("GOOGLE_API_KEY"):
         print("GOOGLE_API_KEY environment variable not set.")
-        exit(1)        
+        exit(1)
 
     import uvicorn
+
     # Setup the connection details, these should be set in the environment
     host = os.environ.get("A2A_UI_HOST", "0.0.0.0")
     port = int(os.environ.get("A2A_UI_PORT", "12000"))

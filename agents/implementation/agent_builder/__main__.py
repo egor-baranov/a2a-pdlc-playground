@@ -1,7 +1,7 @@
 from common.server import A2AServer
 from common.types import AgentCard, AgentCapabilities, AgentSkill, MissingAPIKeyError
 from task_manager import AgentTaskManager
-from agent import QAAgent
+from agent import AgentBuilderTemplate
 import click
 import os
 import logging
@@ -44,14 +44,14 @@ def main(host, port):
             ),
             url=f"http://{host}:{port}/",
             version="1.0.0",
-            defaultInputModes=QAAgent.SUPPORTED_CONTENT_TYPES,
-            defaultOutputModes=QAAgent.SUPPORTED_CONTENT_TYPES,
+            defaultInputModes=AgentBuilderTemplate.SUPPORTED_CONTENT_TYPES,
+            defaultOutputModes=AgentBuilderTemplate.SUPPORTED_CONTENT_TYPES,
             capabilities=capabilities,
             skills=[skill],
         )
         server = A2AServer(
             agent_card=agent_card,
-            task_manager=AgentTaskManager(agent=QAAgent()),
+            task_manager=AgentTaskManager(agent=AgentBuilderTemplate()),
             host=host,
             port=port,
         )

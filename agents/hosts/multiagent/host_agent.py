@@ -28,7 +28,7 @@ from common.types import (
     TextPart,
     DataPart,
     Part,
-    TaskStatusUpdateEvent,
+    TaskStatusUpdateEvent
 )
 
 

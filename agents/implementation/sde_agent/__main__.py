@@ -5,6 +5,7 @@ from agent import SDEAgent
 import click
 import os
 import logging
+from starlette.middleware.cors import CORSMiddleware  # Import CORSMiddleware
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -23,15 +24,16 @@ def main(host, port):
 
         capabilities = AgentCapabilities(streaming=True)
         skill = AgentSkill(
-            id="sde_assistance",
-            name="SDE Assistant Tool",
-            description="Assists with software development tasks, including code generation, testing, and debugging.",
-            tags=["sde", "software_development", "code_generation", "testing"],
+            id="website_generation",
+            name="Website Generation Tool",
+            description="Allows website generation by user prompt.",
+            tags=["sde", "website_generation", "code_generation", "software_development"],
             examples=[
                 "Generate Python code for a web scraper.",
                 "Can you debug my JavaScript application?",
             ],
         )
+
         agent_card = AgentCard(
             name="SDE Agent",
             description="This agent made by GitVerse helps with various software development tasks such as generating code, running tests, and refining solutions based on developer inputs.",
@@ -48,6 +50,15 @@ def main(host, port):
             host=host,
             port=port,
         )
+
+        # Add CORSMiddleware to allow requests from any origin (disables CORS restrictions)
+        server.app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"],  # Allow all origins
+            allow_methods=["*"],  # Allow all HTTP methods (GET, POST, etc.)
+            allow_headers=["*"],  # Allow all headers
+        )
+
         server.start()
     except MissingAPIKeyError as e:
         logger.error(f"Error: {e}")

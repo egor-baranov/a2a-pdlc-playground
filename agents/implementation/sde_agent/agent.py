@@ -101,92 +101,93 @@ def return_solution(task_details: dict[str, Any], code_info: dict[str, Any], tes
 
 
 class SDEAgent:
-  """An agent that handles reimbursement requests."""
+    """An agent that handles reimbursement requests."""
 
-  SUPPORTED_CONTENT_TYPES = ["text", "text/plain"]
+    SUPPORTED_CONTENT_TYPES = ["text", "text/plain"]
 
-  def __init__(self):
-    self._agent = self._build_agent()
-    self._user_id = "remote_agent"
-    self._runner = Runner(
-        app_name=self._agent.name,
-        agent=self._agent,
-        artifact_service=InMemoryArtifactService(),
-        session_service=InMemorySessionService(),
-        memory_service=InMemoryMemoryService(),
-    )
+    def __init__(self):
+        self._agent = self._build_agent()
+        self._user_id = "remote_agent"
+        self._runner = Runner(
+            app_name=self._agent.name,
+            agent=self._agent,
+            artifact_service=InMemoryArtifactService(),
+            session_service=InMemorySessionService(),
+            memory_service=InMemoryMemoryService(),
+        )
 
-  def invoke(self, query, session_id) -> str:
-    session = self._runner.session_service.get_session(
-        app_name=self._agent.name, user_id=self._user_id, session_id=session_id
-    )
-    content = types.Content(
-        role="user", parts=[types.Part.from_text(text=query)]
-    )
-    if session is None:
-      session = self._runner.session_service.create_session(
-          app_name=self._agent.name,
-          user_id=self._user_id,
-          state={},
-          session_id=session_id,
-      )
-    events = self._runner.run(
-        user_id=self._user_id, session_id=session.id, new_message=content
-    )
-    if not events or not events[-1].content or not events[-1].content.parts:
-      return ""
-    return "\n".join([p.text for p in events[-1].content.parts if p.text])
+    def invoke(self, query, session_id) -> str:
+        session = self._runner.session_service.get_session(
+            app_name=self._agent.name, user_id=self._user_id, session_id=session_id
+        )
+        content = types.Content(
+            role="user", parts=[types.Part.from_text(text=query)]
+        )
 
-  async def stream(self, query, session_id) -> AsyncIterable[Dict[str, Any]]:
-    session = self._runner.session_service.get_session(
-        app_name=self._agent.name, user_id=self._user_id, session_id=session_id
-    )
-    content = types.Content(
-        role="user", parts=[types.Part.from_text(text=query)]
-    )
-    if session is None:
-      session = self._runner.session_service.create_session(
-          app_name=self._agent.name,
-          user_id=self._user_id,
-          state={},
-          session_id=session_id,
-      )
-    async for event in self._runner.run_async(
-        user_id=self._user_id, session_id=session.id, new_message=content
-    ):
-      if event.is_final_response():
-        response = ""
-        if (
-            event.content
-            and event.content.parts
-            and event.content.parts[0].text
+        if session is None:
+            session = self._runner.session_service.create_session(
+                app_name=self._agent.name,
+                user_id=self._user_id,
+                state={},
+                session_id=session_id,
+            )
+        events = list(self._runner.run(
+            user_id=self._user_id, session_id=session.id, new_message=content
+        ))
+        if not events or not events[-1].content or not events[-1].content.parts:
+            return ""
+        return "\n".join([p.text for p in events[-1].content.parts if p.text])
+
+    async def stream(self, query, session_id) -> AsyncIterable[Dict[str, Any]]:
+        session = self._runner.session_service.get_session(
+            app_name=self._agent.name, user_id=self._user_id, session_id=session_id
+        )
+        content = types.Content(
+            role="user", parts=[types.Part.from_text(text=query)]
+        )
+        if session is None:
+            session = self._runner.session_service.create_session(
+                app_name=self._agent.name,
+                user_id=self._user_id,
+                state={},
+                session_id=session_id,
+            )
+        async for event in self._runner.run_async(
+                user_id=self._user_id, session_id=session.id, new_message=content
         ):
-          response = "\n".join([p.text for p in event.content.parts if p.text])
-        elif (
-            event.content
-            and event.content.parts
-            and any([True for p in event.content.parts if p.function_response])):
-          response = next((p.function_response.model_dump() for p in event.content.parts))
-        yield {
-            "is_task_complete": True,
-            "content": response,
-        }
-      else:
-        yield {
-            "is_task_complete": False,
-            "updates": "Processing the SDE request...",
-        }
+            if event.is_final_response():
+                response = ""
+                if (
+                        event.content
+                        and event.content.parts
+                        and event.content.parts[0].text
+                ):
+                    response = "\n".join([p.text for p in event.content.parts if p.text])
+                elif (
+                        event.content
+                        and event.content.parts
+                        and any([True for p in event.content.parts if p.function_response])):
+                    response = next((p.function_response.model_dump() for p in event.content.parts))
+                yield {
+                    "is_task_complete": True,
+                    "content": response,
+                }
+            else:
+                yield {
+                    "is_task_complete": False,
+                    "updates": "Processing the SDE request...",
+                }
 
-  def _build_agent(self) -> LlmAgent:
-      """Builds the LLM agent for the Software Development Engineer (SDE) tasks."""
-      return LlmAgent(
-          model="gemini-2.0-flash-001",
-          name="sde_agent",
-          description=(
-              "This agent assists with various software development tasks, including code generation, debugging, "
-              "and solution validation."
-          ),
-          instruction="""
+    def _build_agent(self) -> LlmAgent:
+        """Builds the LLM agent for the Software Development Engineer (SDE) tasks."""
+        return LlmAgent(
+            model="gemini-2.0-flash-001",
+            name="sde_agent",
+            description=(
+                "This agent assists with various software development tasks, including code generation, debugging, "
+                "and solution validation."
+            ),
+            instruction="""
       You are an agent who assists the Software Development Engineer (SDE) with development tasks made by GitVerse.
 
       When you receive a software development request, you should first gather all necessary information:
@@ -203,11 +204,9 @@ class SDEAgent:
 
       In your response, include a summary of the task details and the final status, indicating any improvements or modifications you applied.
           """,
-          tools=[
-              generate_code,
-              run_tests,
-              return_solution,
-          ],
-      )
-
-
+            tools=[
+                generate_code,
+                run_tests,
+                return_solution,
+            ],
+        )
